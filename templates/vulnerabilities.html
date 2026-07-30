@@ -134,6 +134,7 @@
                         <th>CVE</th>
                         <th>CVSS</th>
                         <th>Severity</th>
+                        <th>Risk Priority</th>
                         <th>Status</th>
                         <th>Created</th>
                     </tr>
@@ -185,7 +186,13 @@
                             </span>
 
                         </td>
+                        <td>
 
+                            <span class="severity-badge severity-{{ vulnerability.risk_priority|lower }}">
+                                {{ vulnerability.risk_priority }}
+                            </span>
+
+                        </td>
                         <td>
 
                             <span class="status-badge">

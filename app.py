@@ -47,7 +47,81 @@ login_manager.login_view = "login"
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
+def calculate_vulnerability_risk(cvss_score, asset_criticality, status):
 
+    # --------------------------------
+    # CVSS COMPONENT - MAX 60 POINTS
+    # --------------------------------
+
+    cvss_component = (float(cvss_score) / 10) * 60
+
+
+    # --------------------------------
+    # ASSET CRITICALITY - MAX 30
+    # --------------------------------
+
+    asset_weights = {
+        "Low": 7.5,
+        "Medium": 15,
+        "High": 22.5,
+        "Critical": 30
+    }
+
+    asset_component = asset_weights.get(
+        asset_criticality,
+        15
+    )
+
+
+    # --------------------------------
+    # STATUS COMPONENT - MAX 10
+    # --------------------------------
+
+    status_weights = {
+        "Open": 10,
+        "In Progress": 7,
+        "Remediated": 2,
+        "Closed": 0
+    }
+
+    status_component = status_weights.get(
+        status,
+        10
+    )
+
+
+    # --------------------------------
+    # FINAL SCORE
+    # --------------------------------
+
+    risk_score = round(
+        cvss_component
+        + asset_component
+        + status_component,
+        1
+    )
+
+    risk_score = min(risk_score, 100)
+
+
+    # --------------------------------
+    # PRIORITY
+    # --------------------------------
+
+    if risk_score >= 80:
+        risk_priority = "Critical"
+
+    elif risk_score >= 60:
+        risk_priority = "High"
+
+    elif risk_score >= 40:
+        risk_priority = "Medium"
+
+    else:
+        risk_priority = "Low"
+
+
+    return risk_score, risk_priority
 # -------------------------
 # LOGIN
 # -------------------------
@@ -113,25 +187,24 @@ def dashboard():
     critical_count = (
         Incident.query.filter_by(severity="Critical").count()
         +
-        Vulnerability.query.filter_by(severity="Critical").count()
-    )
-
+        Vulnerability.query.filter_by(risk_priority="Critical").count()
+    )    
     high_count = (
         Incident.query.filter_by(severity="High").count()
         +
-        Vulnerability.query.filter_by(severity="High").count()
+        Vulnerability.query.filter_by(risk_priority="High").count()
     )
 
     medium_count = (
         Incident.query.filter_by(severity="Medium").count()
         +
-        Vulnerability.query.filter_by(severity="Medium").count()
+        Vulnerability.query.filter_by(risk_priority="Medium").count()
     )
 
     low_count = (
         Incident.query.filter_by(severity="Low").count()
         +
-        Vulnerability.query.filter_by(severity="Low").count()
+        Vulnerability.query.filter_by(risk_priority="Low").count()
     )
 
 
@@ -382,6 +455,10 @@ def create_vulnerability():
         affected_asset = request.form.get("affected_asset", "").strip()
         cve_id = request.form.get("cve_id", "").strip()
         cvss_input = request.form.get("cvss_score", "").strip()
+        asset_criticality = request.form.get(
+            "asset_criticality",
+        ""
+        ).strip()
         description = request.form.get("description", "").strip()
         remediation = request.form.get("remediation", "").strip()
 
@@ -406,7 +483,23 @@ def create_vulnerability():
         if cvss_score < 0 or cvss_score > 10:
             flash("CVSS score must be between 0 and 10.", "error")
             return redirect(url_for("create_vulnerability"))
+        allowed_criticalities = [
+            "Low",
+            "Medium",
+            "High",
+            "Critical"
+        ]
 
+        if asset_criticality not in allowed_criticalities:
+
+            flash(
+                "Please select a valid asset criticality.",
+                "error"
+            )
+
+            return redirect(
+                url_for("create_vulnerability")
+            )
         # Automatically calculate severity from CVSS
         if cvss_score >= 9.0:
             severity = "Critical"
@@ -419,13 +512,21 @@ def create_vulnerability():
 
         else:
             severity = "Low"
-
+        risk_score, risk_priority = calculate_vulnerability_risk(
+            cvss_score,
+            asset_criticality,
+            "Open"
+        )
+        
         vulnerability = Vulnerability(
             title=title,
             affected_asset=affected_asset,
             cve_id=cve_id if cve_id else None,
             cvss_score=cvss_score,
             severity=severity,
+            asset_criticality=asset_criticality,
+            risk_score=risk_score,
+            risk_priority=risk_priority,
             description=description,
             remediation=remediation,
             status="Open",
@@ -487,7 +588,14 @@ def update_vulnerability_status(id):
         )
 
     vulnerability.status = new_status
+    risk_score, risk_priority = calculate_vulnerability_risk(
+        vulnerability.cvss_score,
+        vulnerability.asset_criticality,
+        new_status
+    )
 
+    vulnerability.risk_score = risk_score
+    vulnerability.risk_priority = risk_priority
     db.session.commit()
 
     flash(
