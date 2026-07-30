@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import datetime
+from flask_migrate import Migrate
 from flask_login import (
     LoginManager,
     login_user,
@@ -27,6 +28,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # -------------------------
 
 db.init_app(app)
+migrate = Migrate(app, db)
 
 
 # -------------------------

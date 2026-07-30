@@ -163,6 +163,23 @@ class Vulnerability(db.Model):
         db.String(20),
         nullable=False
     )
+    asset_criticality = db.Column(
+        db.String(20),
+        nullable=False,
+        default="Medium"
+    )
+
+    risk_score = db.Column(
+        db.Float,
+        nullable=False,
+        default=0
+    )
+
+    risk_priority = db.Column(
+        db.String(20),
+        nullable=False,
+        default="Low"
+    )
 
     description = db.Column(
         db.Text,
