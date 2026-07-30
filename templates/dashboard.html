@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | CyberShield</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="dashboard-body">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="shield-logo">🛡️</div>
+
+            <div>
+                <h2>CyberShield</h2>
+                <span>Security Management</span>
+            </div>
+        </div>
+
+
+        <nav class="sidebar-menu">
+
+            <a href="{{ url_for('dashboard') }}" class="menu-item active">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+           <a href="{{ url_for('incidents') }}" class="menu-item">
+                <span>⚠</span>
+                Incidents
+            </a>
+
+            <a href="{{ url_for('vulnerabilities') }}" class="menu-item">
+                <span>◆</span>
+                Vulnerabilities
+            </a>
+
+            <a href="#" class="menu-item">
+                <span>▤</span>
+                Reports
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-user">
+
+                <div class="user-avatar">
+                    {{ user.name[0] }}
+                </div>
+
+                <div>
+                    <strong>{{ user.name }}</strong>
+                    <span>{{ user.role }}</span>
+                </div>
+
+            </div>
+
+            <a href="{{ url_for('logout') }}"
+               class="logout-link">
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+                <h1>Security Overview</h1>
+
+                <p>
+                    Monitor and manage your cybersecurity operations.
+                </p>
+            </div>
+
+            <div class="system-status">
+                <span class="status-dot"></span>
+                System Operational
+            </div>
+
+        </header>
+
+
+        <!-- SUMMARY CARDS -->
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+
+                <div class="card-heading">
+                    <span>Total Incidents</span>
+                    <div class="card-icon">⚠</div>
+                </div>
+
+                <h2>{{ total_incidents }}</h2>
+
+                <p>
+                    {% if total_incidents == 0 %}
+                        No incidents recorded
+                    {% elif total_incidents == 1 %}
+                        1 incident recorded
+                    {% else %}
+                        {{ total_incidents }} incidents recorded
+                    {% endif %}
+                </p>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="card-heading">
+                    <span>Open Vulnerabilities</span>
+                    <div class="card-icon">◆</div>
+                </div>
+
+                <h2>0</h2>
+
+                <p>No vulnerabilities recorded</p>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="card-heading">
+                    <span>Critical Findings</span>
+                    <div class="card-icon danger-icon">!</div>
+                </div>
+
+                <h2>{{ critical_incidents }}</h2>
+
+                <p>{% if critical_incidents == 0 %}
+                        No critical findings
+                    {% else %}
+                        Requires immediate attention
+                    {% endif %}
+                </p>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="card-heading">
+                    <span>Overall Risk</span>
+                    <div class="card-icon">◎</div>
+                </div>
+
+                <h2 class="risk-{{ overall_risk|lower }}">
+                    {{ overall_risk }}
+                </h2>
+
+                <p>Current security posture</p>
+
+            </div>
+
+        </section>
+
+
+        <!-- LOWER SECTION -->
+
+        <section class="dashboard-grid">
+
+            <div class="dashboard-panel">
+
+                <div class="panel-header">
+                    <div>
+                        <h3>Recent Security Activity</h3>
+                        <p>Latest incidents and vulnerabilities</p>
+                    </div>
+                </div>
+                
+                {% if recent_incidents %}
+
+                    <div class="activity-list">
+
+                     {% for incident in recent_incidents %}
+
+                        <a
+                            href="{{ url_for('incident_details', id=incident.id) }}"
+                            class="activity-item"
+                        >
+
+                            <div class="activity-main">
+
+                                <span class="activity-id">
+                                    {{ incident.incident_id }}
+                                </span>
+
+                                <strong>
+                                    {{ incident.title }}
+                                </strong>
+
+                                <small>
+                                    {{ incident.affected_asset }}
+                                </small>
+
+                            </div>
+
+
+                            <div class="activity-right">
+
+                                <span class="badge {{ incident.severity|lower }}">
+                                    {{ incident.severity }}
+                                </span>
+
+                                <span class="activity-status">
+                                    {{ incident.status }}
+                                </span>
+
+                            </div>
+
+                        </a>
+
+                    {% endfor %}
+
+                </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">✓</div>
+
+                        <h3>No security activity yet</h3>
+
+                        <p>
+                            New incidents and vulnerabilities will appear here.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+                
+
+            </div>
+
+
+            <div class="dashboard-panel">
+
+                <div class="panel-header">
+                    <div>
+                        <h3>Risk Distribution</h3>
+                        <p>Findings grouped by severity</p>
+                    </div>
+                </div>
+
+
+                <div class="severity-list">
+
+                    <div class="severity-row">
+                        <span>Critical</span>
+                        <strong>{{ critical_count }}</strong>
+                    </div>
+
+                    <div class="severity-row">
+                        <span>High</span>
+                        <strong>{{ high_count }}</strong>
+                    </div>
+
+                    <div class="severity-row">
+                        <span>Medium</span>
+                        <strong>{{ medium_count }}</strong>
+                    </div>
+
+                    <div class="severity-row">
+                        <span>Low</span>
+                        <strong>{{ low_count }}</strong>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

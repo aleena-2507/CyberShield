@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vulnerabilities | CyberShield</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="dashboard-body">
+
+<aside class="sidebar">
+
+    <div class="sidebar-brand">
+
+        <div class="shield-logo">🛡️</div>
+
+        <div>
+            <h2>CyberShield</h2>
+            <span>Security Management</span>
+        </div>
+
+    </div>
+
+
+    <nav class="sidebar-menu">
+
+        <a href="{{ url_for('dashboard') }}"
+           class="menu-item">
+            <span>▦</span>
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('incidents') }}"
+           class="menu-item">
+            <span>⚠</span>
+            Incidents
+        </a>
+
+        <a href="{{ url_for('vulnerabilities') }}"
+           class="menu-item active">
+            <span>◆</span>
+            Vulnerabilities
+        </a>
+
+        <a href="#"
+           class="menu-item">
+            <span>▤</span>
+            Reports
+        </a>
+
+    </nav>
+
+
+    <div class="sidebar-bottom">
+
+        <div class="sidebar-user">
+
+            <div class="user-avatar">
+                {{ user.name[0] }}
+            </div>
+
+            <div>
+                <strong>{{ user.name }}</strong>
+                <span>{{ user.role }}</span>
+            </div>
+
+        </div>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout-link">
+            Logout
+        </a>
+
+    </div>
+
+</aside>
+
+
+<main class="main-content">
+
+    <header class="page-header">
+
+        <div>
+            <h1>Vulnerability Management</h1>
+
+            <p>
+                Identify, prioritise and track security vulnerabilities.
+            </p>
+        </div>
+
+
+        <a href="{{ url_for('create_vulnerability') }}"
+           class="primary-button">
+            + New Vulnerability
+        </a>
+
+    </header>
+
+
+    {% with messages = get_flashed_messages() %}
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="success-message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <section class="content-panel">
+
+        {% if vulnerabilities %}
+
+            <table class="security-table">
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Vulnerability</th>
+                        <th>Asset</th>
+                        <th>CVE</th>
+                        <th>CVSS</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for vulnerability in vulnerabilities %}
+
+                    <tr>
+                        <td class="record-id">
+
+                            <a href="{{ url_for('vulnerability_details', id=vulnerability.id) }}"
+                                class="incident-link">
+
+                                    {{ vulnerability.vulnerability_id }}
+
+                                </a>
+
+                        </td>
+                        
+
+                        <td>
+                            {{ vulnerability.title }}
+                        </td>
+
+                        <td>
+                            {{ vulnerability.affected_asset }}
+                        </td>
+
+                        <td>
+                            {% if vulnerability.cve_id %}
+                                {{ vulnerability.cve_id }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ "%.1f"|format(vulnerability.cvss_score) }}
+                        </td>
+
+                        <td>
+
+                            <span class="badge {{ vulnerability.severity|lower }}">
+                                {{ vulnerability.severity }}
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <span class="status-badge">
+                                {{ vulnerability.status }}
+                            </span>
+
+                        </td>
+
+                        <td>
+                            {{ vulnerability.created_at.strftime('%d %b %Y') }}
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+
+        {% else %}
+
+            <div class="incident-empty-state">
+
+                <div class="empty-icon">◆</div>
+
+                <h3>No vulnerabilities recorded</h3>
+
+                <p>
+                    Add your first vulnerability to begin tracking security findings.
+                </p>
+
+                <a href="{{ url_for('create_vulnerability') }}"
+                   class="primary-button">
+                    + Add Vulnerability
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>New Incident | CyberShield</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="shield-logo">🛡️</div>
+
+            <div>
+                <h2>CyberShield</h2>
+                <span>Security Management</span>
+            </div>
+
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <a href="{{ url_for('dashboard') }}"
+               class="menu-item">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('incidents') }}"
+               class="menu-item active">
+                <span>⚠</span>
+                Incidents
+            </a>
+
+            <a href="#" class="menu-item">
+                <span>◆</span>
+                Vulnerabilities
+            </a>
+
+            <a href="#" class="menu-item">
+                <span>▤</span>
+                Reports
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <div class="form-page">
+
+            <a href="{{ url_for('incidents') }}"
+               class="back-link">
+                ← Back to Incidents
+            </a>
+
+            <div class="form-heading">
+
+                <h1>Create Security Incident</h1>
+
+                <p>
+                    Record a security event for investigation and tracking.
+                </p>
+
+            </div>
+
+
+            <form method="POST" class="incident-form">
+
+                <div class="form-field">
+
+                    <label>Incident Title *</label>
+
+                    <input
+                        type="text"
+                        name="title"
+                        placeholder="e.g. Suspicious Login Activity"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label>Affected Asset *</label>
+
+                    <input
+                        type="text"
+                        name="affected_asset"
+                        placeholder="e.g. Employee-Laptop-07"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label>Severity *</label>
+
+                    <select name="severity" required>
+
+                        <option value="" disabled selected>
+                            Select severity
+                        </option>
+
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label>Description *</label>
+
+                    <textarea
+                        name="description"
+                        rows="7"
+                        placeholder="Describe what happened, how it was detected and any relevant observations..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <a href="{{ url_for('incidents') }}"
+                       class="secondary-button">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="primary-button form-submit">
+                        Create Incident
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

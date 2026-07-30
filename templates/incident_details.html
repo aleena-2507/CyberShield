@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ incident.incident_id }} | CyberShield
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body class="dashboard-body">
+
+
+<aside class="sidebar">
+
+    <div class="sidebar-brand">
+
+        <div class="shield-logo">🛡️</div>
+
+        <div>
+            <h2>CyberShield</h2>
+            <span>Security Management</span>
+        </div>
+
+    </div>
+
+
+    <nav class="sidebar-menu">
+
+        <a href="{{ url_for('dashboard') }}"
+           class="menu-item">
+
+            <span>▦</span>
+            Dashboard
+
+        </a>
+
+
+        <a href="{{ url_for('incidents') }}"
+           class="menu-item active">
+
+            <span>⚠</span>
+            Incidents
+
+        </a>
+
+
+        <a href="{{ url_for('vulnerabilities') }}" class="menu-item">
+            <span>◆</span>
+            Vulnerabilities
+        </a>
+
+
+        <a href="#"
+           class="menu-item">
+
+            <span>▤</span>
+            Reports
+
+        </a>
+
+    </nav>
+
+
+    <div class="sidebar-bottom">
+
+        <div class="sidebar-user">
+
+            <div class="user-avatar">
+                {{ user.name[0] }}
+            </div>
+
+            <div>
+
+                <strong>
+                    {{ user.name }}
+                </strong>
+
+                <span>
+                    {{ user.role }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <a href="{{ url_for('logout') }}"
+           class="logout-link">
+
+            Logout
+
+        </a>
+
+    </div>
+
+</aside>
+
+
+<main class="main-content">
+
+
+    <a href="{{ url_for('incidents') }}"
+       class="back-link">
+
+        ← Back to Incidents
+
+    </a>
+
+
+    <!-- FLASH MESSAGES -->
+
+    {% with messages = get_flashed_messages() %}
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="success-message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- INCIDENT HEADER -->
+
+    <div class="incident-detail-header">
+
+        <div>
+
+            <span class="record-id">
+                {{ incident.incident_id }}
+            </span>
+
+            <h1>
+                {{ incident.title }}
+            </h1>
+
+            <p>
+                Security Incident Investigation
+            </p>
+
+        </div>
+
+
+        <span class="badge {{ incident.severity|lower }}">
+
+            {{ incident.severity }}
+
+        </span>
+
+    </div>
+
+
+    <!-- INFORMATION -->
+
+    <section class="incident-info-grid">
+
+
+        <div class="detail-card">
+
+            <span>Status</span>
+
+            <strong>
+                {{ incident.status }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <span>Affected Asset</span>
+
+            <strong>
+                {{ incident.affected_asset }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <span>Reported By</span>
+
+            <strong>
+                {{ incident.creator.name }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <span>Created</span>
+
+            <strong>
+                {{ incident.created_at.strftime('%d %b %Y %H:%M') }}
+            </strong>
+
+        </div>
+
+    </section>
+
+
+    <section class="detail-section">
+
+        <h3>Description</h3>
+
+        <p>
+            {{ incident.description }}
+        </p>
+
+    </section>
+
+
+    <!-- STATUS -->
+
+    <section class="detail-section">
+
+        <h3>Investigation Status</h3>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('update_incident_status', id=incident.id) }}"
+            class="status-form">
+
+
+            <select name="status">
+
+                <option value="Open"
+                    {% if incident.status == "Open" %}
+                        selected
+                    {% endif %}>
+                    Open
+                </option>
+
+
+                <option value="Investigating"
+                    {% if incident.status == "Investigating" %}
+                        selected
+                    {% endif %}>
+                    Investigating
+                </option>
+
+
+                <option value="Resolved"
+                    {% if incident.status == "Resolved" %}
+                        selected
+                    {% endif %}>
+                    Resolved
+                </option>
+
+
+                <option value="Closed"
+                    {% if incident.status == "Closed" %}
+                        selected
+                    {% endif %}>
+                    Closed
+                </option>
+
+            </select>
+
+
+            <button type="submit"
+                    class="primary-button">
+
+                Update Status
+
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- INVESTIGATION NOTES -->
+
+    <section class="detail-section">
+
+        <h3>Investigation Notes</h3>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('add_incident_note', id=incident.id) }}"
+            class="note-form">
+
+
+            <textarea
+                name="note"
+                rows="4"
+                placeholder="Add investigation findings, observations or actions taken..."
+                required></textarea>
+
+
+            <button type="submit"
+                    class="primary-button">
+
+                Add Note
+
+            </button>
+
+        </form>
+
+
+        <div class="notes-list">
+
+            {% if notes %}
+
+
+                {% for note in notes %}
+
+                    <div class="investigation-note">
+
+                        <div class="note-meta">
+
+                            <strong>
+                                {{ note.author.name }}
+                            </strong>
+
+                            <span>
+                                {{ note.created_at.strftime('%d %b %Y %H:%M') }}
+                            </span>
+
+                        </div>
+
+
+                        <p>
+                            {{ note.note }}
+                        </p>
+
+                    </div>
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <div class="no-notes">
+
+                    No investigation notes have been added yet.
+
+                </div>
+
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+</main>
+
+</body>
+</html>

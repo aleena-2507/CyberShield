@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Incidents | CyberShield</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="shield-logo">🛡️</div>
+
+            <div>
+                <h2>CyberShield</h2>
+                <span>Security Management</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <a href="{{ url_for('dashboard') }}" class="menu-item">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('incidents') }}" class="menu-item active">
+                <span>⚠</span>
+                Incidents
+            </a>
+
+            <a href="{{ url_for('vulnerabilities') }}" class="menu-item">
+                <span>◆</span>
+                Vulnerabilities
+            </a>
+
+            <a href="#" class="menu-item">
+                <span>▤</span>
+                Reports
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-user">
+
+                <div class="user-avatar">
+                    {{ user.name[0] }}
+                </div>
+
+                <div>
+                    <strong>{{ user.name }}</strong>
+                    <span>{{ user.role }}</span>
+                </div>
+
+            </div>
+
+            <a href="{{ url_for('logout') }}" class="logout-link">
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <header class="page-header">
+
+            <div>
+                <h1>Incident Management</h1>
+                <p>
+                    Record, investigate and track security incidents.
+                </p>
+            </div>
+
+            <a href="{{ url_for('create_incident') }}"
+               class="primary-button">
+                + New Incident
+            </a>
+
+        </header>
+
+
+        {% with messages = get_flashed_messages() %}
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="success-message">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <section class="content-panel">
+
+            {% if incidents %}
+
+                <table class="security-table">
+
+                    <thead>
+                        <tr>
+                            <th>Incident ID</th>
+                            <th>Title</th>
+                            <th>Asset</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for incident in incidents %}
+
+                        <tr>
+
+                            <td class="record-id">
+
+                                <a href="{{ url_for('incident_details', id=incident.id) }}"
+                                    class="incident-link">
+
+                                    {{ incident.incident_id }}
+
+                                </a>
+
+                            </td>
+                            <td>
+                                {{ incident.title }}
+                            </td>
+
+                            <td>
+                                {{ incident.affected_asset }}
+                            </td>
+
+                            <td>
+                                <span class="badge {{ incident.severity|lower }}">
+                                    {{ incident.severity }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="status-badge">
+                                    {{ incident.status }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ incident.created_at.strftime('%d %b %Y') }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            {% else %}
+
+                <div class="incident-empty-state">
+
+                    <div class="empty-icon">⚠</div>
+
+                    <h3>No incidents recorded</h3>
+
+                    <p>
+                        Create your first security incident to begin tracking.
+                    </p>
+
+                    <a href="{{ url_for('create_incident') }}"
+                       class="primary-button">
+                        + Create Incident
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</body>
+</html>
