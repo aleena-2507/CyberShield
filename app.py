@@ -82,37 +82,68 @@ def login():
 @login_required
 def dashboard():
 
-    # Total number of incidents
+    # -------------------------
+    # INCIDENT DATA
+    # -------------------------
+
     total_incidents = Incident.query.count()
 
-    # Incidents that still require attention
     active_incidents = Incident.query.filter(
         Incident.status.in_(["Open", "Investigating"])
     ).count()
 
-    # Critical incidents
-    critical_incidents = Incident.query.filter_by(
-        severity="Critical"
+
+    # -------------------------
+    # VULNERABILITY DATA
+    # -------------------------
+
+    total_vulnerabilities = Vulnerability.query.count()
+
+    open_vulnerabilities = Vulnerability.query.filter(
+        Vulnerability.status.in_(["Open", "In Progress"])
     ).count()
 
-    # Severity distribution
-    critical_count = Incident.query.filter_by(
-        severity="Critical"
-    ).count()
 
-    high_count = Incident.query.filter_by(
-        severity="High"
-    ).count()
+    # -------------------------
+    # COMBINED SEVERITY COUNTS
+    # -------------------------
 
-    medium_count = Incident.query.filter_by(
-        severity="Medium"
-    ).count()
+    critical_count = (
+        Incident.query.filter_by(severity="Critical").count()
+        +
+        Vulnerability.query.filter_by(severity="Critical").count()
+    )
 
-    low_count = Incident.query.filter_by(
-        severity="Low"
-    ).count()
+    high_count = (
+        Incident.query.filter_by(severity="High").count()
+        +
+        Vulnerability.query.filter_by(severity="High").count()
+    )
 
-    # Determine overall risk level
+    medium_count = (
+        Incident.query.filter_by(severity="Medium").count()
+        +
+        Vulnerability.query.filter_by(severity="Medium").count()
+    )
+
+    low_count = (
+        Incident.query.filter_by(severity="Low").count()
+        +
+        Vulnerability.query.filter_by(severity="Low").count()
+    )
+
+
+    # -------------------------
+    # CRITICAL FINDINGS
+    # -------------------------
+
+    critical_findings = critical_count
+
+
+    # -------------------------
+    # OVERALL RISK
+    # -------------------------
+
     if critical_count > 0:
         overall_risk = "CRITICAL"
 
@@ -125,23 +156,42 @@ def dashboard():
     else:
         overall_risk = "LOW"
 
-    # Latest 5 incidents
+
+    # -------------------------
+    # RECENT ACTIVITY
+    # -------------------------
+
     recent_incidents = Incident.query.order_by(
         Incident.created_at.desc()
     ).limit(5).all()
 
+    recent_vulnerabilities = Vulnerability.query.order_by(
+        Vulnerability.created_at.desc()
+    ).limit(5).all()
+
+
     return render_template(
         "dashboard.html",
+
         user=current_user,
+
         total_incidents=total_incidents,
         active_incidents=active_incidents,
-        critical_incidents=critical_incidents,
+
+        total_vulnerabilities=total_vulnerabilities,
+        open_vulnerabilities=open_vulnerabilities,
+
+        critical_findings=critical_findings,
+
         critical_count=critical_count,
         high_count=high_count,
         medium_count=medium_count,
         low_count=low_count,
+
         overall_risk=overall_risk,
-        recent_incidents=recent_incidents
+
+        recent_incidents=recent_incidents,
+        recent_vulnerabilities=recent_vulnerabilities
     )
 # -------------------------
 # INCIDENT MANAGEMENT

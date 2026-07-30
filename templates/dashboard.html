@@ -134,9 +134,17 @@
                     <div class="card-icon">◆</div>
                 </div>
 
-                <h2>0</h2>
+                <h2>{{ open_vulnerabilities }}</h2>
 
-                <p>No vulnerabilities recorded</p>
+                <p>
+                    {% if open_vulnerabilities == 0 %}
+                        No open vulnerabilities
+                    {% elif open_vulnerabilities == 1 %}
+                        1 vulnerability requires attention
+                    {% else %}
+                        {{ open_vulnerabilities }} vulnerabilities require attention
+                    {% endif %}
+                </p>
 
             </div>
 
@@ -148,9 +156,9 @@
                     <div class="card-icon danger-icon">!</div>
                 </div>
 
-                <h2>{{ critical_incidents }}</h2>
+                <h2>{{ critical_findings }}</h2>
 
-                <p>{% if critical_incidents == 0 %}
+                <p>{% if critical_findings == 0 %}
                         No critical findings
                     {% else %}
                         Requires immediate attention
@@ -191,7 +199,7 @@
                     </div>
                 </div>
                 
-                {% if recent_incidents %}
+                {% if recent_incidents or recent_vulnerabilities %}
 
                     <div class="activity-list">
 
@@ -234,6 +242,45 @@
                         </a>
 
                     {% endfor %}
+    {% for vulnerability in recent_vulnerabilities %}
+
+    <a
+        href="{{ url_for('vulnerability_details', id=vulnerability.id) }}"
+        class="activity-item"
+    >
+
+        <div class="activity-main">
+
+            <span class="activity-id">
+                {{ vulnerability.vulnerability_id }}
+            </span>
+
+            <strong>
+                {{ vulnerability.title }}
+            </strong>
+
+            <small>
+                {{ vulnerability.affected_asset }}
+            </small>
+
+        </div>
+
+
+        <div class="activity-right">
+
+            <span class="badge {{ vulnerability.severity|lower }}">
+                {{ vulnerability.severity }}
+            </span>
+
+            <span class="activity-status">
+                {{ vulnerability.status }}
+            </span>
+
+        </div>
+
+    </a>
+
+    {% endfor %}
 
                 </div>
 
