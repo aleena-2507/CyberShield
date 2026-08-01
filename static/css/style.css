@@ -1427,3 +1427,11 @@ button:hover {
 .search-form button{
     width:160px;
 }
+.incident-chart-container{
+    width: 100%;
+    height: 260px;
+    margin-top: 20px;
+}
+.dashboard-panel.full-width{
+    grid-column:1 / -1;
+}

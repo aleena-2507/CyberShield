@@ -312,8 +312,10 @@
                         <p>Findings grouped by severity</p>
                     </div>
                 </div>
-
-
+                <div style="height:300px; margin-bottom:30px;">
+                    <canvas id="riskChart"></canvas>
+                </div>
+                
                 <div class="severity-list">
 
                     <div class="severity-row">
@@ -338,11 +340,166 @@
                 </div>
 
             </div>
+            <div class="dashboard-panel">
 
+                <div class="panel-header">
+                    <div>
+                        <h3>Incident Status</h3>
+                        <p>Distribution of incident lifecycle stages.</p>
+                    </div>
+                </div>
+
+                <div class="incident-chart-container">
+                    <canvas id="incidentChart"></canvas>
+                </div>
+
+    </div>
         </section>
 
     </main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
 
+const ctx = document.getElementById('riskChart');
+
+new Chart(ctx, {
+
+    type: 'doughnut',
+
+    data: {
+
+        labels: [
+            'Critical',
+            'High',
+            'Medium',
+            'Low'
+        ],
+
+        datasets: [{
+
+            data: [
+                {{ critical_count }},
+                {{ high_count }},
+                {{ medium_count }},
+                {{ low_count }}
+            ],
+
+            backgroundColor: [
+                '#ef4444',
+                '#f97316',
+                '#eab308',
+                '#22c55e'
+            ],
+
+            borderWidth: 2
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                position: 'bottom',
+
+                labels: {
+
+                    color: '#ffffff'
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+const incidentCtx = document.getElementById('incidentChart');
+
+new Chart(incidentCtx, {
+
+    type: 'bar',
+
+    data: {
+
+        labels: [
+            'Open',
+            'Investigating',
+            'Resolved',
+            'Closed'
+        ],
+
+        datasets: [{
+
+            label: 'Incidents',
+
+            data: [
+
+                {{ open_incidents }},
+                {{ investigating_incidents }},
+                {{ resolved_incidents }},
+                {{ closed_incidents }}
+
+            ],
+
+            backgroundColor: [
+
+                '#3b82f6',
+                '#f59e0b',
+                '#10b981',
+                '#6b7280'
+
+            ],
+
+            borderRadius: 8
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+        maintainAspectRatio: false,
+
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            }
+
+        },
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true,
+
+                ticks: {
+
+                    precision: 0
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
 </body>
 
 </html>

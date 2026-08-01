@@ -179,6 +179,19 @@ def dashboard():
     active_incidents = Incident.query.filter(
         Incident.status.in_(["Open", "Investigating"])
     ).count()
+    open_incidents = Incident.query.filter_by(status="Open").count()
+
+    investigating_incidents = Incident.query.filter_by(
+        status="Investigating"
+    ).count()
+
+    resolved_incidents = Incident.query.filter_by(
+        status="Resolved"
+    ).count()
+
+    closed_incidents = Incident.query.filter_by(
+        status="Closed"
+    ).count()
 
 
     # -------------------------
@@ -278,7 +291,11 @@ def dashboard():
         overall_risk=overall_risk,
 
         recent_incidents=recent_incidents,
-        recent_vulnerabilities=recent_vulnerabilities
+        recent_vulnerabilities=recent_vulnerabilities,
+        open_incidents=open_incidents,
+        investigating_incidents=investigating_incidents,
+        resolved_incidents=resolved_incidents,
+        closed_incidents=closed_incidents,
     )
 # -------------------------
 # INCIDENT MANAGEMENT
