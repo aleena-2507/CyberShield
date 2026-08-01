@@ -1396,3 +1396,34 @@ button:hover {
 .btn-primary:hover{
     background:#1583cc;
 }
+/* Search Bar */
+
+.search-form{
+    display:flex;
+    gap:12px;
+    margin:24px 0;
+    align-items:center;
+}
+
+.search-input{
+    flex:1;
+    padding:12px 16px;
+    border:1px solid #2b3854;
+    border-radius:10px;
+    background:#111827;
+    color:white;
+    font-size:15px;
+}
+
+.search-input::placeholder{
+    color:#7b8ba5;
+}
+
+.search-input:focus{
+    outline:none;
+    border-color:#2196f3;
+}
+
+.search-form button{
+    width:160px;
+}

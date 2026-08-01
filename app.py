@@ -446,16 +446,36 @@ def add_incident_note(id):
 @login_required
 def vulnerabilities():
 
-    all_vulnerabilities = Vulnerability.query.order_by(
-        Vulnerability.created_at.desc()
-    ).all()
+    search = request.args.get("search", "").strip()
+
+    if search:
+
+        vulnerabilities = Vulnerability.query.filter(
+
+            db.or_(
+
+                Vulnerability.vulnerability_id.ilike(f"%{search}%"),
+                Vulnerability.title.ilike(f"%{search}%"),
+                Vulnerability.affected_asset.ilike(f"%{search}%")
+
+            )
+
+        ).order_by(
+            Vulnerability.created_at.desc()
+        ).all()
+
+    else:
+
+        vulnerabilities = Vulnerability.query.order_by(
+            Vulnerability.created_at.desc()
+        ).all()
 
     return render_template(
         "vulnerabilities.html",
-        vulnerabilities=all_vulnerabilities,
-        user=current_user
+        vulnerabilities=vulnerabilities,
+        user=current_user,
+        search=search
     )
-
 
 @app.route("/vulnerabilities/create", methods=["GET", "POST"])
 @login_required

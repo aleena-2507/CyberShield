@@ -99,6 +99,21 @@
         </a>
 
     </header>
+    <form method="GET" class="search-form">
+
+    <input
+        type="text"
+        name="search"
+        value="{{ search }}"
+        placeholder="Search by ID, Title or Asset..."
+        class="search-input"
+    >
+
+    <button type="submit" class="primary-button">
+        Search
+    </button>
+
+    </form>
 
 
     {% with messages = get_flashed_messages() %}
