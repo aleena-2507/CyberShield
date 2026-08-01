@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reports | CyberShield</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="dashboard-body">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="shield-logo">🛡️</div>
+
+            <div>
+                <h2>CyberShield</h2>
+                <span>Security Management</span>
+            </div>
+        </div>
+
+
+        <nav class="sidebar-menu">
+
+            <a href="{{ url_for('dashboard') }}" class="menu-item">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('incidents') }}" class="menu-item">
+                <span>⚠</span>
+                Incidents
+            </a>
+
+            <a href="{{ url_for('vulnerabilities') }}" class="menu-item">
+                <span>◆</span>
+                Vulnerabilities
+            </a>
+
+            <a href="{{ url_for('reports') }}" class="menu-item active">
+                <span>▤</span>
+                Reports
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-user">
+
+                <div class="user-avatar">
+                    {{ user.name[0] }}
+                </div>
+
+                <div>
+                    <strong>{{ user.name }}</strong>
+                    <span>{{ user.role }}</span>
+                </div>
+
+            </div>
+
+            <a href="{{ url_for('logout') }}"
+               class="logout-link">
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+                <h1>Security Reports</h1>
+
+                <p>
+                    Review cybersecurity operations, findings and risk posture.
+                </p>
+            </div>
+            <div style="display:flex; align-items:center; gap:16px;">
+
+                <div class="system-status">
+                    <span class="status-dot"></span>
+                    Reporting Active
+                </div>
+                <a href="{{ url_for('download_report') }}"
+                    class="btn-primary">
+
+                    Download Report
+
+                </a>
+
+            </div>
+           
+
+        </header>
+
+
+        <!-- INCIDENT SUMMARY -->
+
+        <section class="dashboard-cards">
+
+            <div class="stat-card">
+                <span>Total Incidents</span>
+
+                <h2>{{ total_incidents }}</h2>
+
+                <p>All recorded security incidents</p>
+            </div>
+
+
+            <div class="stat-card">
+                <span>Active Incidents</span>
+
+                <h2>{{ active_incidents }}</h2>
+
+                <p>Currently under investigation</p>
+            </div>
+
+
+            <div class="stat-card">
+                <span>Resolved Incidents</span>
+
+                <h2>{{ resolved_incidents }}</h2>
+
+                <p>Resolved or closed incidents</p>
+            </div>
+
+        </section>
+
+
+        <!-- VULNERABILITY SUMMARY -->
+
+        <section class="dashboard-cards">
+
+            <div class="stat-card">
+                <span>Total Vulnerabilities</span>
+
+                <h2>{{ total_vulnerabilities }}</h2>
+
+                <p>All identified vulnerabilities</p>
+            </div>
+
+
+            <div class="stat-card">
+                <span>Open Vulnerabilities</span>
+
+                <h2>{{ open_vulnerabilities }}</h2>
+
+                <p>Require remediation attention</p>
+            </div>
+
+
+            <div class="stat-card">
+                <span>Remediated Vulnerabilities</span>
+
+                <h2>{{ remediated_vulnerabilities }}</h2>
+
+                <p>Remediated or closed findings</p>
+            </div>
+
+        </section>
+
+
+        <!-- RISK SUMMARY -->
+
+        <section class="content-panel">
+
+            <h2>Vulnerability Risk Summary</h2>
+
+            <p>
+                Vulnerabilities grouped by CyberShield risk priority.
+            </p>
+
+
+            <div class="dashboard-cards">
+
+            <div class="stat-card report-risk critical">
+                <span>Critical Risk</span>
+                <h2>{{ critical_risks }}</h2>
+            </div>
+
+            <div class="stat-card report-risk high">
+                <span>High Risk</span>
+                <h2>{{ high_risks }}</h2>
+            </div>
+
+            <div class="stat-card report-risk medium">
+                <span>Medium Risk</span>
+                <h2>{{ medium_risks }}</h2>
+            </div>
+
+            <div class="stat-card report-risk low">
+                <span>Low Risk</span>
+                <h2>{{ low_risks }}</h2>
+            </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

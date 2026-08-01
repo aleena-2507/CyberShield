@@ -1262,3 +1262,137 @@ button:hover {
     color: #64748b;
     font-size: 10px;
 }
+/* ========================================
+   REPORTS PAGE
+======================================== */
+
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-bottom: 28px;
+}
+
+.stat-card {
+    background: #0d1728;
+    border: 1px solid #22314a;
+    border-radius: 14px;
+    padding: 24px;
+    min-height: 130px;
+}
+
+.stat-card span {
+    display: block;
+    color: #7f9bc5;
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.stat-card h2 {
+    font-size: 32px;
+    margin: 0 0 8px 0;
+    color: #ffffff;
+}
+
+.stat-card p {
+    color: #6f8db8;
+    font-size: 14px;
+    margin: 0;
+}
+
+
+/* Reports risk section */
+
+.content-panel {
+    background: #0d1728;
+    border: 1px solid #22314a;
+    border-radius: 14px;
+    padding: 26px;
+    margin-top: 10px;
+}
+
+.content-panel > h2 {
+    margin: 0 0 6px 0;
+    font-size: 21px;
+}
+
+.content-panel > p {
+    color: #6f8db8;
+    margin: 0 0 24px 0;
+}
+
+.content-panel .dashboard-cards {
+    grid-template-columns: repeat(4, 1fr);
+    margin-bottom: 0;
+}
+
+.content-panel .stat-card {
+    min-height: 100px;
+}
+
+
+/* Responsive Reports */
+
+@media (max-width: 1000px) {
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .content-panel .dashboard-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .content-panel .dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+}
+/* Reports risk colours */
+
+.report-risk.critical {
+    border-top: 3px solid #dc2626;
+}
+
+.report-risk.critical h2 {
+    color: #ff5c5c;
+}
+
+.report-risk.high {
+    border-top: 3px solid #ea580c;
+}
+
+.report-risk.high h2 {
+    color: #ff7a2f;
+}
+
+.report-risk.medium {
+    border-top: 3px solid #d4a017;
+}
+
+.report-risk.medium h2 {
+    color: #e5b82e;
+}
+
+.report-risk.low {
+    border-top: 3px solid #16a34a;
+}
+
+.report-risk.low h2 {
+    color: #36c96b;
+}
+/* Download Report Button */
+
+.btn-primary{
+    background:#1d9bf0;
+    color:white;
+    text-decoration:none;
+    padding:12px 22px;
+    border-radius:10px;
+    font-weight:600;
+    transition:.2s;
+}
+
+.btn-primary:hover{
+    background:#1583cc;
+}

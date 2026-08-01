@@ -9,7 +9,19 @@ from flask_login import (
     current_user
 )
 from werkzeug.security import check_password_hash
+from io import BytesIO
 
+from flask import send_file
+
+from reportlab.lib.units import inch
+
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer
+)
+
+from reportlab.lib.styles import getSampleStyleSheet
 from models import db, User, Incident, IncidentNote, Vulnerability
 
 app = Flask(__name__)
@@ -605,6 +617,201 @@ def update_vulnerability_status(id):
 
     return redirect(
         url_for("vulnerability_details", id=id)
+    )
+# -------------------------
+# REPORTS
+# -------------------------
+
+@app.route("/reports")
+@login_required
+def reports():
+
+    # Incident statistics
+    total_incidents = Incident.query.count()
+
+    active_incidents = Incident.query.filter(
+        Incident.status.in_(["Open", "Investigating"])
+    ).count()
+
+    resolved_incidents = Incident.query.filter(
+        Incident.status.in_(["Resolved", "Closed"])
+    ).count()
+
+
+    # Vulnerability statistics
+    total_vulnerabilities = Vulnerability.query.count()
+
+    open_vulnerabilities = Vulnerability.query.filter(
+        Vulnerability.status.in_(["Open", "In Progress"])
+    ).count()
+
+    remediated_vulnerabilities = Vulnerability.query.filter(
+        Vulnerability.status.in_(["Remediated", "Closed"])
+    ).count()
+
+
+    # Risk priority statistics
+    critical_risks = Vulnerability.query.filter_by(
+        risk_priority="Critical"
+    ).count()
+
+    high_risks = Vulnerability.query.filter_by(
+        risk_priority="High"
+    ).count()
+
+    medium_risks = Vulnerability.query.filter_by(
+        risk_priority="Medium"
+    ).count()
+
+    low_risks = Vulnerability.query.filter_by(
+        risk_priority="Low"
+    ).count()
+
+
+    return render_template(
+        "reports.html",
+        user=current_user,
+
+        total_incidents=total_incidents,
+        active_incidents=active_incidents,
+        resolved_incidents=resolved_incidents,
+
+        total_vulnerabilities=total_vulnerabilities,
+        open_vulnerabilities=open_vulnerabilities,
+        remediated_vulnerabilities=remediated_vulnerabilities,
+
+        critical_risks=critical_risks,
+        high_risks=high_risks,
+        medium_risks=medium_risks,
+        low_risks=low_risks
+    )
+@app.route("/reports/download")
+@login_required
+def download_report():
+
+    buffer = BytesIO()
+
+    doc = SimpleDocTemplate(buffer)
+
+    styles = getSampleStyleSheet()
+
+    story = []
+
+    # -----------------------
+    # Title
+    # -----------------------
+
+    story.append(
+        Paragraph("CyberShield Security Report", styles["Title"])
+    )
+
+    story.append(Spacer(1, 0.3 * inch))
+
+
+    # -----------------------
+    # Incident Summary
+    # -----------------------
+
+    story.append(
+        Paragraph("<b>Incident Summary</b>", styles["Heading2"])
+    )
+
+    story.append(
+        Paragraph(
+            f"Total Incidents: {Incident.query.count()}",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"Active Incidents: {Incident.query.filter(Incident.status.in_(['Open','Investigating'])).count()}",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"Resolved Incidents: {Incident.query.filter(Incident.status.in_(['Resolved','Closed'])).count()}",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(Spacer(1, 0.25 * inch))
+
+
+    # -----------------------
+    # Vulnerability Summary
+    # -----------------------
+
+    story.append(
+        Paragraph("<b>Vulnerability Summary</b>", styles["Heading2"])
+    )
+
+    story.append(
+        Paragraph(
+            f"Total Vulnerabilities: {Vulnerability.query.count()}",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"Critical Risks: {Vulnerability.query.filter_by(risk_priority='Critical').count()}",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"High Risks: {Vulnerability.query.filter_by(risk_priority='High').count()}",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"Medium Risks: {Vulnerability.query.filter_by(risk_priority='Medium').count()}",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"Low Risks: {Vulnerability.query.filter_by(risk_priority='Low').count()}",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(Spacer(1, 0.25 * inch))
+
+
+    # -----------------------
+    # Recommendations
+    # -----------------------
+
+    story.append(
+        Paragraph("<b>Recommendations</b>", styles["Heading2"])
+    )
+
+    story.append(
+        Paragraph(
+            "Prioritize Critical and High risk findings. "
+            "Continue incident monitoring, vulnerability remediation, "
+            "and periodic security assessments.",
+            styles["BodyText"]
+        )
+    )
+
+    doc.build(story)
+
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name="CyberShield_Security_Report.pdf",
+        mimetype="application/pdf"
     )
 # -------------------------
 # LOGOUT
