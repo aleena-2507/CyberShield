@@ -10,8 +10,10 @@ from flask_login import (
 )
 from werkzeug.security import check_password_hash
 from io import BytesIO
+from functools import wraps
 
 from flask import send_file
+from flask import abort
 
 from reportlab.lib.units import inch
 
@@ -25,7 +27,15 @@ from reportlab.lib.styles import getSampleStyleSheet
 from models import db, User, Incident, IncidentNote, Vulnerability
 
 app = Flask(__name__)
-
+def roles_required(*roles):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if current_user.role not in roles:
+                abort(403)
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 # -------------------------
 # APPLICATION CONFIGURATION
 # -------------------------
@@ -316,8 +326,9 @@ def incidents():
     )
 
 
-@app.route("/incidents/create", methods=["GET", "POST"])
+@app.route("/create_incident", methods=["GET", "POST"])
 @login_required
+@roles_required("Admin", "Analyst")
 def create_incident():
 
     if request.method == "POST":
@@ -494,8 +505,9 @@ def vulnerabilities():
         search=search
     )
 
-@app.route("/vulnerabilities/create", methods=["GET", "POST"])
+@app.route("/create_vulnerability", methods=["GET", "POST"])
 @login_required
+@roles_required("Admin", "Analyst")
 def create_vulnerability():
 
     if request.method == "POST":

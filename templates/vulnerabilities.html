@@ -92,12 +92,12 @@
             </p>
         </div>
 
-
+        {% if current_user.role != "Viewer" %}
         <a href="{{ url_for('create_vulnerability') }}"
            class="primary-button">
             + New Vulnerability
         </a>
-
+        {% endif %}
     </header>
     <form method="GET" class="search-form">
 
