@@ -69,6 +69,20 @@ class Incident(db.Model):
         nullable=False,
         default="Open"
     )
+    mitre_id = db.Column(
+        db.String(20),
+        nullable=True
+    )
+
+    mitre_technique = db.Column(
+        db.String(150),
+        nullable=True
+    )
+
+    mitre_tactic = db.Column(
+        db.String(100),
+        nullable=True
+    )
 
     created_by = db.Column(
         db.Integer,
@@ -195,6 +209,20 @@ class Vulnerability(db.Model):
         db.String(30),
         nullable=False,
         default="Open"
+    )
+    mitre_id = db.Column(
+        db.String(20),
+        nullable=True
+    )
+
+    mitre_technique = db.Column(
+        db.String(150),
+        nullable=True
+    )
+
+    mitre_tactic = db.Column(
+        db.String(100),
+        nullable=True
     )
 
     created_by = db.Column(

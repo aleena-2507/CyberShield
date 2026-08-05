@@ -123,6 +123,29 @@
                     </select>
 
                 </div>
+                <div class="form-field">
+
+                    <label>MITRE ATT&CK Technique</label>
+
+                    <select name="mitre_id">
+
+                    <option value="" selected>
+            Select MITRE Technique (Optional)
+        </option>
+
+        {% for mitre_id, data in mitre_attack.items() %}
+        <option value="{{ mitre_id }}">
+            {{ mitre_id }} - {{ data.technique }}
+        </option>
+        {% endfor %}
+
+    </select>
+
+    <small class="form-hint">
+        Map this incident to a MITRE ATT&CK technique.
+    </small>
+
+</div>
 
 
                 <div class="form-field">

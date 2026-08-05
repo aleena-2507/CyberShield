@@ -225,6 +225,32 @@
         </p>
 
     </section>
+    {% if incident.mitre_id %}
+    <div class="detail-card">
+
+        <h3>MITRE ATT&CK Mapping</h3>
+
+        <div class="detail-grid">
+
+            <div class="detail-item">
+                <span class="detail-label">Technique ID</span>
+                <strong>{{ incident.mitre_id }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Technique</span>
+                <strong>{{ incident.mitre_technique }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Tactic</span>
+                <strong>{{ incident.mitre_tactic }}</strong>
+            </div>
+
+        </div>
+
+    </div>
+    {% endif %}
 
 
     <!-- STATUS -->

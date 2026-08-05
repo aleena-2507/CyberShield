@@ -44,6 +44,56 @@ app.config["SECRET_KEY"] = "cybershield-development-key"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cybershield.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+MITRE_ATTACK = {
+    "T1566": {
+        "technique": "Phishing",
+        "tactic": "Initial Access"
+    },
+    "T1190": {
+        "technique": "Exploit Public-Facing Application",
+        "tactic": "Initial Access"
+    },
+    "T1110": {
+        "technique": "Brute Force",
+        "tactic": "Credential Access"
+    },
+    "T1059": {
+        "technique": "Command and Scripting Interpreter",
+        "tactic": "Execution"
+    },
+    "T1486": {
+        "technique": "Data Encrypted for Impact",
+        "tactic": "Impact"
+    },
+    "T1003": {
+        "technique": "OS Credential Dumping",
+        "tactic": "Credential Access"
+    },
+    "T1021": {
+        "technique": "Remote Services",
+        "tactic": "Lateral Movement"
+    },
+    "T1078": {
+        "technique": "Valid Accounts",
+        "tactic": "Defense Evasion"
+    },
+    "T1041": {
+        "technique": "Exfiltration Over C2 Channel",
+        "tactic": "Exfiltration"
+    },
+    "T1105": {
+        "technique": "Ingress Tool Transfer",
+        "tactic": "Command and Control"
+    },
+    "T1055": {
+        "technique": "Process Injection",
+        "tactic": "Defense Evasion"
+    },
+    "T1547": {
+        "technique": "Boot or Logon Autostart Execution",
+        "tactic": "Persistence"
+    }
+}
 
 # -------------------------
 # DATABASE
@@ -337,7 +387,7 @@ def create_incident():
         description = request.form.get("description", "").strip()
         affected_asset = request.form.get("affected_asset", "").strip()
         severity = request.form.get("severity", "").strip()
-
+        mitre_id = request.form.get("mitre_id")
         allowed_severities = ["Low", "Medium", "High", "Critical"]
 
         if not title or not description or not affected_asset:
@@ -347,6 +397,12 @@ def create_incident():
         if severity not in allowed_severities:
             flash("Please select a valid severity.", "error")
             return redirect(url_for("create_incident"))
+        mitre_technique = None
+        mitre_tactic = None
+
+        if mitre_id in MITRE_ATTACK:
+            mitre_technique = MITRE_ATTACK[mitre_id]["technique"]
+            mitre_tactic = MITRE_ATTACK[mitre_id]["tactic"]
 
         incident = Incident(
             title=title,
@@ -354,9 +410,15 @@ def create_incident():
             affected_asset=affected_asset,
             severity=severity,
             status="Open",
+
+            mitre_id=mitre_id,
+            mitre_technique=mitre_technique,
+            mitre_tactic=mitre_tactic,
+
             created_by=current_user.id
         )
 
+        
         db.session.add(incident)
         db.session.flush()
 
@@ -375,7 +437,8 @@ def create_incident():
 
     return render_template(
         "create_incident.html",
-        user=current_user
+        user=current_user,
+        mitre_attack=MITRE_ATTACK
     )
 
 @app.route("/incidents/<int:id>")
@@ -833,8 +896,6 @@ def download_report():
     )
 
     story.append(Spacer(1, 0.25 * inch))
-
-
     # -----------------------
     # Recommendations
     # -----------------------
